@@ -1,4 +1,4 @@
-App Link: 
+App Link: https://ai-ml-smartbridge-project-credit-card.onrender.com/
 
 Credit-Card-Approval-Prediction
 
@@ -13,7 +13,3 @@ Repository Structure
 7. Project Documentation
 8. Project Demonstration
 
-Deployment Notes
-
-- Run the Flask app from [5.Project Development Phase](5.Project%20Development%20Phase) for local development.
-- Render uses the root [requirements.txt](requirements.txt) and starts the app with `gunicorn --chdir "5.Project Development Phase" app:app`.
