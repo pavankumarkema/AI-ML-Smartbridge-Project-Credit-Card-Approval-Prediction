@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import joblib
@@ -70,7 +71,7 @@ print("\nENCODER MAPPINGS:")
 for col, le in encoders.items():
     print(f"\n  {col}:")
     for i, cls in enumerate(le.classes_):
-        print(f"    '{cls}' → {i}")
+        print(f"    '{cls}' -> {i}")
 print("=" * 50 + "\n")
 
 
@@ -83,18 +84,27 @@ def safe_encode(col_name, value):
     classes = list(le.classes_)
     value = str(value).strip()
 
+    if col_name == "Citizen":
+        synonym_map = {
+            "Indian": "ByBirth",
+            "Other than Indian": "ByOtherMeans",
+            "By birth": "ByBirth",
+            "By other means": "ByOtherMeans",
+        }
+        value = synonym_map.get(value, value)
+
     if value in classes:
         return int(le.transform([value])[0])
 
     try:
         numeric_val = int(float(value))
         if 0 <= numeric_val < len(classes):
-            print(f"  ⚠️ Numeric fallback: '{value}' → {numeric_val} for {col_name}")
+            print(f"  WARNING: Numeric fallback: '{value}' -> {numeric_val} for {col_name}")
             return numeric_val
     except Exception:
         pass
 
-    print(f"  ⚠️ Unknown value '{value}' for {col_name}. Classes: {classes}. Using 0.")
+    print(f"  WARNING: Unknown value '{value}' for {col_name}. Classes: {classes}. Using 0.")
     return 0
 
 
@@ -111,7 +121,7 @@ def predict():
             raise ValueError("Request body must be a JSON object.")
 
         print("\n" + "=" * 50)
-        print("📥 NEW PREDICTION REQUEST")
+        print("NEW PREDICTION REQUEST")
         print("=" * 50)
         print("Raw input:", data)
 
@@ -120,9 +130,9 @@ def predict():
         citizen_enc = safe_encode("Citizen", data["citizen"])
 
         print("\nEncoded:")
-        print(f"  Gender   : '{data['gender']}' → {gender_enc}")
-        print(f"  Industry : '{data['industry']}' → {industry_enc}")
-        print(f"  Citizen  : '{data['citizen']}' → {citizen_enc}")
+        print(f"  Gender   : '{data['gender']}' -> {gender_enc}")
+        print(f"  Industry : '{data['industry']}' -> {industry_enc}")
+        print(f"  Citizen  : '{data['citizen']}' -> {citizen_enc}")
 
         input_data = {
             "Gender": gender_enc,
@@ -149,19 +159,20 @@ def predict():
         confidence = round(float(max(probability)) * 100, 1)
         approved = bool(prediction == 1)
 
-        print(f"\n🎯 Result     : {'APPROVED' if approved else 'REJECTED'}")
-        print(f"📊 Confidence : {confidence}%")
-        print(f"📊 Proba      : Rejected={probability[0]:.3f} | Approved={probability[1]:.3f}")
+        print(f"\nRESULT      : {'APPROVED' if approved else 'REJECTED'}")
+        print(f"CONFIDENCE  : {confidence}%")
+        print(f"PROBA       : Rejected={probability[0]:.3f} | Approved={probability[1]:.3f}")
         print("=" * 50 + "\n")
 
         return jsonify({"approved": approved, "confidence": confidence})
 
     except Exception as e:
         import traceback
-        print("❌ ERROR:", str(e))
+        print("ERROR:", str(e))
         traceback.print_exc()
         return jsonify({"error": str(e)}), 400
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
