@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: credit-card-approval-prediction
-    env: python
-    buildCommand: pip install -r "5.Project Development Phase/requirements.txt"
-    startCommand: gunicorn --chdir "5.Project Development Phase" app:app
-    autoDeploy: true

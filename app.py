@@ -1,25 +1,14 @@
-from importlib.util import module_from_spec, spec_from_file_location
-from pathlib import Path
 import os
+import runpy
+from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent
-APP_FILE = BASE_DIR / "5.Project Development Phase" / "app.py"
+APP_PATH = BASE_DIR / "5.Project Development Phase" / "app.py"
 
 
-def load_app_module():
-    spec = spec_from_file_location("credit_card_app", APP_FILE)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Unable to load app module from {APP_FILE}")
-
-    module = module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-_app_module = load_app_module()
-app = _app_module.app
-application = app
+module_globals = runpy.run_path(str(APP_PATH), run_name="credit_card_app")
+app = module_globals["app"]
 
 
 if __name__ == "__main__":
