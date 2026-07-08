@@ -2,7 +2,7 @@ App Link: https://ai-ml-smartbridge-project-credit-card.onrender.com/
 
 Credit-Card-Approval-Prediction
 
-Repository Structure:
+Repository Structure
 
 1. Brainstorming & Ideation
 2. Requirement Analysis
